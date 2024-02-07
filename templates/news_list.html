@@ -1,0 +1,83 @@
+<!-- 文件路径：templates/news_list.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>所有新闻列表</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<!-- ...其他头信息略... -->
+
+<!-- 日期选择器 -->
+<div class="mb-3">
+    <input type="date" id="datePicker" name="date" value="{{ selected_date }}">
+    <button id="filterDateBtn" class="btn btn-primary">筛选日期</button>
+</div>
+
+<!-- 标签页元素 -->
+<ul class="nav nav-tabs" id="platformTabs">
+    <li class="nav-item">
+        <a class="nav-link active" id="all-tab" data-toggle="tab" href="#all" role="tab" aria-controls="all" aria-selected="true">全平台</a>
+    </li>
+    {% for platform_name, news_items in platform_news.items() %}
+    <li class="nav-item">
+        <a class="nav-link" id="{{ platform_name }}-tab" data-toggle="tab" href="#{{ platform_name }}" role="tab" aria-controls="{{ platform_name }}" aria-selected="false">{{ platform_name }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- 标签页内容 -->
+<div class="tab-content" id="platformTabsContent">
+    <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+        <!-- 全平台新闻列表 -->
+                <!-- 新闻列表 -->
+        <ul class="list-group">
+            {% for news in news_items %}
+            <li class="list-group-item">
+                <a href="{{ news.link }}" target="_blank">{{ news.title }}</a> - {{ news.hot_topic }} - ({{news.date}})
+            </li>
+            {% endfor %}
+        </ul>
+        <!-- ...全平台新闻列表的循环代码... -->
+    </div>
+    {% for platform_name, news_items in platform_news.items() %}
+    <div class="tab-pane fade" id="{{ platform_name }}" role="tabpanel" aria-labelledby="{{ platform_name }}-tab">
+        <!-- 平台特定新闻列表 -->
+        <!-- 新闻列表 -->
+        <ul class="list-group">
+            {% for news in news_items %}
+            <li class="list-group-item">
+                <a href="{{ news.link }}" target="_blank">{{ news.title }}</a> - {{ news.hot_topic }} - ({{news.date}})
+            </li>
+            {% endfor %}
+        </ul>
+        <!-- ...平台特定新闻列表的循环代码... -->
+    </div>
+    {% endfor %}
+</div>
+
+<!-- 页面底部的脚本 -->
+<script>
+document.getElementById('filterDateBtn').addEventListener('click', function(){
+    let selectedDate = document.getElementById('datePicker').value;
+    window.location.href = `/news_list?date=${selectedDate}`;
+});
+
+// 使用 jQuery 激活 Bootstrap 标签页的行为
+$(function () {
+    $('#platformTabs a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
+})
+</script>
+
+<!-- ...其他Bootstrap脚本略... -->
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

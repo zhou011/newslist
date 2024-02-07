@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新闻列表</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container mt-3">
+    <!-- 操作区 -->
+    <div class="mb-3">
+        <button id="update-news-btn" class="btn btn-primary">更新最新新闻</button>
+    </div>
+
+    <!-- 新闻标签页内容 -->
+    <div class="tab-content" id="newsTabContent">
+        {% for platform_name, news_items in platform_news.items() %}
+        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+             id="{{ platform_name }}" role="tabpanel" 
+             aria-labelledby="{{ platform_name }}-tab">
+            <!-- 每个平台的新闻列表 -->
+            <ul class="list-group list-group-flush">
+                {% for news in news_items %}
+                <li class="list-group-item">
+                    <a href="{{ news.link }}" target="_blank">{{ news.title }}</a> - {{ news.hot_topic }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+
+    
+</div>
+
+<!-- 更新结果反馈弹框 -->
+<div class="modal" id="update-result-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p id="update-result-text"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    $('#update-news-btn').click(function () {
+        $.ajax({
+            url: '/update_news',
+            method: 'POST',
+            success: function(response) {
+                // 弹框展示更新信息
+                $('#update-result-text').text('更新成功: ' + response.inserted + ' 条新闻, 重复: ' + response.duplicates + ' 条。');
+                $('#update-result-modal').modal('show');
+            },
+            error: function(xhr, status, error) {
+                // 弹框展示错误信息
+                $('#update-result-text').text('更新失败，错误信息：' + xhr.responseText);
+                $('#update-result-modal').modal('show');
+            }
+        });
+    });
+});
+</script>
+
+<!-- 确保 jQuery 和 Bootstrap 的 JS 已经在文件末尾加载，并添加新的关于标签页的 jQuery 代码 -->
+<script type="text/javascript">
+$(function () {
+  // Bootstrap tab功能激活
+  $('#newsTabContent a').on('click', function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  });
+
+  // 默认激活第一个标签页
+  $('#newsTabContent a:first').tab('show');
+});
+</script>
+    
+</body>
+</html>
